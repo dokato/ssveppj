@@ -8,7 +8,7 @@ import scipy.signal as ss
 from ssvepfun import *
 import pywt # do dekompozycji falkowej
 
-NAZWA='data63/h6030_s03_ml_o1'
+NAZWA='data/h5_s03_is_o1'
 o1_bez=np.load(NAZWA+'_bez.npy')
 o1_sty=np.load(NAZWA+'_stym.npy')
 
@@ -81,27 +81,25 @@ def wspkor(ar1,ar2):
 	'''oblicza wspolczynnik korelacji dla dwu prob takiej samej wielkosci'''
 	return np.corrcoef(ar1,ar2,ddof=1)[0][1]
 
-#rm,ws,wr=oblicz_roznice_mocy(o1_bez, o1_sty,wiecej=8)
-#py.plot(np.arange(len(rm)),rm,'go')
-#py.xlabel('nr trialu')
-#py.ylabel('roznica mocy')
+rm,ws,wr=oblicz_roznice_mocy(o1_bez, o1_sty,wiecej=8)
+py.plot(np.arange(len(rm)),rm,'go')
+py.xlabel('nr trialu')
+py.ylabel('roznica mocy')
 						#py.savefig('g:/pyth/ssvep_pj/result/'+NAZWA[5:]+'moctrial.png')
 #py.show()
 
-#uw_ref,fv1=usrednione_widmo(o1_bez)
-#uw_sty,fv2=usrednione_widmo(o1_sty)
+uw_ref,fv1=usrednione_widmo(o1_bez)
+uw_sty,fv2=usrednione_widmo(o1_sty)
 
 #ryspary(fv1,uw_ref,fv2,uw_sty,lim_y=np.max(uw_sty)+1e4)
 
 #print 'wspolczynnik korelacji', wspkor(rm,np.arange(len(rm)))
 #spektrogramy()
 
-sred_r,sred_s=np.average(o1_bez,axis=0),np.average(o1_sty,axis=0)
-tree1 = pywt.wavedec(sred_r, 'db5')
-tree2 = pywt.wavedec(sred_s, 'db5')
-py.subplot(121)
-scalogram(tree1)
-py.subplot(122)
-scalogram(tree2)
-
-py.show()
+def fazy():
+	pha,amp=rob_liste_fazy(o1_sty)
+	py.figure()
+	py.polar(pha,amp,'o')
+	py.show()
+fazy()
+	

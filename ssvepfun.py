@@ -103,6 +103,21 @@ def rob_liste_mocy(arr,fs=512):
 		wek[e]=P[ind]
 	return wek
 
+def rob_liste_fazy(arr,fs=512):
+	"""zwraca wartosci fazy dla odpowiedniego trialu"""
+	Flg=1
+	phase=np.zeros(len(arr))
+	r=np.zeros(len(arr))
+	for e,tr in enumerate(arr):
+		F=np.fft.fftshift(np.fft.fft(tr))
+		fv=np.fft.fftshift(np.fft.fftfreq(len(F),1./fs))
+		if Flg==1:
+			ind=ind_cz(fv)
+			Flg=0
+		phase[e]=np.angle(F[ind])
+		r[e]=abs(F[ind])
+	return phase,r
+
 def oblicz_roznice_mocy(arr_bez,arr_sty,wiecej=0):
 	rpc=np.zeros(len(arr_bez))
 	wek_r,wek_s=rob_liste_mocy(arr_bez),rob_liste_mocy(arr_sty)

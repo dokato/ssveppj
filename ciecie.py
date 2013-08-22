@@ -14,8 +14,8 @@ FOLDER='data63'
 ELEKTRODA='o1' # <- nazwa elektrody
 ch_o=18# 18 - O1, 19 - O2, 15 - Pz  <---nr elektrody z pliku XML
 SKALA=3e6
-OBRAZKI=1
-SAVE=0
+OBRAZKI=0
+SAVE=0 # zapis pocietych danych do pliku
 
 ####
 
@@ -76,9 +76,9 @@ def zapis_obr():
 		py.figure()
 		ryspary_brzeg(fv,P,fvs,Ps,pokaz=False,lim_y=SKALA)
 		
-		newpath = 'g:/pyth/ssvep_pj/'+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA
+		newpath = os.getcwd()+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA
 		if not os.path.exists(newpath): os.makedirs(newpath)
-		py.savefig('g:/pyth/ssvep_pj/'+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA+'/'+str(PZ)+'.png')
+		py.savefig(os.getcwd()+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA+'/'+str(PZ)+'.png')
 
 		print PZ,
 
