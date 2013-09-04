@@ -49,7 +49,6 @@ def periodogram(s,w,fs,k=1):
 	fv=np.fft.fftshift(np.fft.fftfreq(len(ft),1./fs))
 	return (ft**2,fv)
 
-
 def scalogram(data):
 	bottom = 0
 
@@ -83,15 +82,31 @@ def przygotuj_sygn(danne, kanal, Fs=512, chanNr=24, ear1=20):
 	kan-=np.mean(kan)
 	return kan
 
-def ind_cz(fq,step=15):
-	"""Zwraca indeksy cz. podstawowej (step) i jej harmonicznych"""
-	indlis=[]
-	for j in range(0,20,step)[1:]:
-		idx=np.where(fq>=(j-0.1))[0][0]
-		indlis.append(idx)
-	return indlis
+def ind_cz(fq,P=None, step=15, rfval=None):
+	"""troche sie funkcja skomplikowala ale musialem jakos obejsc
+	problem roznych indeksow wektora czestosci z ref i sty i faktu
+	ze pik stymulacji nie zawsze jest w 15 Hz...
+	
+	Zwraca indeksy cz. podstawowej (step) i jej harmonicznych"""
+	if P==None:
+		indlis=[]
+		for j in range(0,20,step)[1:]:
+			idx=np.where(fq>(j-0.01))[0][0]
+			indlis.append(idx)
+		return indlis
+	else:
+		if rfval==None:
+			czp,czk=step-0.1,step+0.1
+			ind_czp, ind_czk = np.where(fq>=czp)[0][0],np.where(fq>=czk)[0][0]
+			ind_of_sty=np.argmax(P[ind_czp,ind_czk])
+			return ind_of_sty
+		else:
+			idx=np.where(fq>=rfval)[0][0]
+			return idx
 
-def rob_liste_mocy(arr,fs=512):
+def rob_liste_mocy(arr,fs=512,czest=15):
+	'''dla podanego wektora z trialami wyrzuca wektor
+	wartosci mocy obliczonej periodogramem dla czestotliwosci'''
 	Flg=1
 	win=np.ones(len(arr[0]))
 	wek=np.zeros(len(arr))
@@ -100,6 +115,26 @@ def rob_liste_mocy(arr,fs=512):
 		if Flg==1:
 			ind=ind_cz(fv)
 			Flg=0
+		wek[e]=P[ind]
+	return wek
+
+def lista_mocy_stym(arr,fs=512,czest=15):
+	win=np.ones(len(arr[0])) #okno
+	wek=np.zeros(len(arr))
+	ind_of_mx=wek.copy()
+	for e,trial in enumerate(arr):
+		(P,fv)=periodogram(trial,win,fs)
+		idx=ind_cz(fv,P,step=czest)
+		ind_of_mx[e]=fv[ind]
+		wek[e]=P[ind]
+	return wek, ind_of_mx
+
+def lista_mocy_ref(arr,ind_mx,fs=512,czest=15):
+	win=np.ones(len(arr[0])) #okno
+	wek=np.zeros(len(arr))
+	for e,trial in enumerate(arr):
+		(P,fv)=periodogram(trial,win,fs)
+		idx=ind_cz(fv,P,step=czest,rfval=ind_mx[e])
 		wek[e]=P[ind]
 	return wek
 
@@ -119,6 +154,10 @@ def rob_liste_fazy(arr,fs=512):
 	return phase,r
 
 def oblicz_roznice_mocy(arr_bez,arr_sty,wiecej=0):
+	'''po zadaniu arr_bez - wektora z trialami bez stymulacji i
+	arr_sty wektora z symulacja wyrzuca wartosci roznicy dla czestosci
+	ustawionej w funkcji rob_liste_mocy
+	dla wiecej=True podaje tez wektory z wartoscia mocy stym i ref'''
 	rpc=np.zeros(len(arr_bez))
 	wek_r,wek_s=rob_liste_mocy(arr_bez),rob_liste_mocy(arr_sty)
 	if np.any(wek_r>2e7):

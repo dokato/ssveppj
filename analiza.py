@@ -6,25 +6,21 @@ import numpy as np
 import pylab as py
 import scipy.signal as ss
 from ssvepfun import *
+import os
 import pywt # do dekompozycji falkowej
+import sys
 
-NAZWA='data/h5_s03_is_o1'
+FOLDER='data63/'
+try:
+	NAZWA= FOLDER+sys.argv[1]
+except Exception:
+	NAZWA=FOLDER+'h6030_s01_mn_o1'
+
 o1_bez=np.load(NAZWA+'_bez.npy')
 o1_sty=np.load(NAZWA+'_stym.npy')
 
 fs=512
 
-def rob_liste_mocy(arr):
-	Flg=1
-	win=np.ones(len(arr[0]))
-	wek=np.zeros(len(arr))
-	for e,tr in enumerate(arr):
-		(P,fv)=periodogram(tr,win,fs)
-		if Flg==1:
-			ind=ind_cz(fv)
-			Flg=0
-		wek[e]=P[ind]
-	return wek
 
 def usrednione_widmo(arr):
 	win=np.ones(len(arr[0]))
@@ -45,18 +41,6 @@ def usrednione_sygnaly():
 	Pr,fv=periodogram(sred_r,np.ones(len(sred_r)),fs)
 	ryspary(fv,Pr,fv,Ps)
 
-def oblicz_roznice_mocy(arr_bez,arr_sty,wiecej=0):
-	rpc=np.zeros(len(arr_bez))
-	wek_r,wek_s=rob_liste_mocy(arr_bez),rob_liste_mocy(arr_sty)
-	if np.any(wek_r>2e7):
-		wek_r[np.where(wek_r>2e7)[0]]=0
-		wek_s[np.where(wek_r>2e7)[0]]=0
-	
-	rpc=wek_s-wek_r
-
-
-	if wiecej==0: return rpc
-	else: return rpc,wek_s, wek_r
 
 def histogramy():
 	py.subplot(211)
@@ -82,10 +66,13 @@ def wspkor(ar1,ar2):
 	return np.corrcoef(ar1,ar2,ddof=1)[0][1]
 
 rm,ws,wr=oblicz_roznice_mocy(o1_bez, o1_sty,wiecej=8)
+print 'mac stym\n',ws
+print 'moc ref\n',wr
+
 py.plot(np.arange(len(rm)),rm,'go')
 py.xlabel('nr trialu')
 py.ylabel('roznica mocy')
-						#py.savefig('g:/pyth/ssvep_pj/result/'+NAZWA[5:]+'moctrial.png')
+py.savefig(os.getcwd()+'/result/'+NAZWA[-15:]+'moctrial.png')
 #py.show()
 
 uw_ref,fv1=usrednione_widmo(o1_bez)
@@ -100,6 +87,6 @@ def fazy():
 	pha,amp=rob_liste_fazy(o1_sty)
 	py.figure()
 	py.polar(pha,amp,'o')
-	py.show()
-fazy()
-	
+	py.savefig(os.getcwd()+'/result/'+NAZWA[-15:]+'faz.png')
+#fazy()
+

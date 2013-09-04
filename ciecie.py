@@ -9,11 +9,11 @@ from ssvepfun import *
 import os
 
 #### wlasciwosci
-NAZWA_PLIKU='h6030_s05_dk'
-FOLDER='data63'
+NAZWA_PLIKU='h5_s05_ml'
+FOLDER='data'
 ELEKTRODA='o1' # <- nazwa elektrody
 ch_o=18# 18 - O1, 19 - O2, 15 - Pz  <---nr elektrody z pliku XML
-SKALA=3e6
+SKALA=6e6
 OBRAZKI=0
 SAVE=0 # zapis pocietych danych do pliku
 
@@ -55,15 +55,19 @@ def zapisz():
 if SAVE==True: zapisz()
 
 
-def zobacz_pojedynczy_trial( PZ=240 ):
+def zobacz_pojedynczy_trial( PZ=201 ):
 	'PZ - numer realizacji, okno prostokatne'
 
-	win=np.ones(elek_bez[PZ].size)
+	win=np.hamming(elek_bez[PZ].size)
 	wins=np.ones(elek_sty[PZ].size)
 	(P,fv)=periodogram(elek_bez[PZ],win,fs)
 	(Ps,fvs)=periodogram(elek_sty[PZ],wins,fs)
 
 	ryspary_brzeg(fv,P,fvs,Ps)
+	py.plot(fv[8090],1e3,'o')
+	py.show()
+
+zobacz_pojedynczy_trial()
 
 def zapis_obr():
 	''''zapisuje obrazki z periodogramu oknem prostakatnym sygnalu
@@ -76,9 +80,9 @@ def zapis_obr():
 		py.figure()
 		ryspary_brzeg(fv,P,fvs,Ps,pokaz=False,lim_y=SKALA)
 		
-		newpath = os.getcwd()+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA
+		newpath = os.getcwd()+'/'+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA
 		if not os.path.exists(newpath): os.makedirs(newpath)
-		py.savefig(os.getcwd()+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA+'/'+str(PZ)+'.png')
+		py.savefig(os.getcwd()+'/'+FOLDER+'/obr/'+NAZWA_PLIKU+ELEKTRODA+'/'+str(PZ)+'.png')
 
 		print PZ,
 

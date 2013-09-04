@@ -7,8 +7,14 @@ import pylab as py
 import scipy.signal as ss
 import scipy.stats as st
 from ssvepfun import *
+import sys
 
-NAZWA='data/h5_s05_ml_o1'
+try:
+	NAZWA='data/'+sys.argv[1]
+except Exception:
+	NAZWA='data/h5_s05_ml_o1'
+
+
 o1_bez=np.load(NAZWA+'_bez.npy')
 o1_sty=np.load(NAZWA+'_stym.npy')
 
