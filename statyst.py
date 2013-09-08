@@ -27,31 +27,36 @@ def randsample(x):
 	y = x[ind]
 	return y
 
-rm,ws,wr=oblicz_roznice_mocy(o1_bez, o1_sty,wiecej=8)
-print 'wczytano'
+	def statystyka1_boot():
+	rm,ws,wr=oblicz_roznice_mocy(o1_bez, o1_sty,wiecej=8)
+	print 'wczytano'
 
-N_rep=1e4
-r_rf = np.zeros((N_rep,1))
-for i in np.arange(N_rep):
-	x_rf = randsample(wr)
-	r_rf[i] = np.mean(x_rf)
+	N_rep=1e4
+	r_rf = np.zeros((N_rep,1))
+	for i in np.arange(N_rep):
+		x_rf = randsample(wr)
+		r_rf[i] = np.mean(x_rf)
 
-print 'zakonczono losowanie'
+	print 'zakonczono losowanie'
 
-ci_rf = st.scoreatpercentile(r_rf, 95)
-print 'Z bootstrapu przedzial gorny od: ', ci_rf
+	ci_rf = st.scoreatpercentile(r_rf, 95)
+	print 'Z bootstrapu przedzial gorny od: ', ci_rf
 
-def zhistem():
-	py.hist(ws)
-	py.hist(wr)
-	py.plot(ci_rf,100,'ro')
-	py.show()
+	def zhistem():
+		py.hist(ws)
+		py.hist(wr)
+		py.plot(ci_rf,100,'ro')
+		py.show()
 
-zhistem()
+	zhistem()
 
-print 'wieksze\nz ref', np.sum(wr>ci_rf)
-print 'z sty %d -procetowo %d' %(np.sum(ws>ci_rf),np.sum(ws>ci_rf)*1e2/len(ws))
-print 'mniejsze\nz ref', np.sum(wr<ci_rf)
-print 'z sty %d -procetowo %d' %(np.sum(ws<ci_rf),np.sum(ws<ci_rf)*1e2/len(ws))
+	print 'wieksze\nz ref', np.sum(wr>ci_rf)
+	print 'z sty %d -procetowo %d' %(np.sum(ws>ci_rf),np.sum(ws>ci_rf)*1e2/len(ws))
+	print 'mniejsze\nz ref', np.sum(wr<ci_rf)
+	print 'z sty %d -procetowo %d' %(np.sum(ws<ci_rf),np.sum(ws<ci_rf)*1e2/len(ws))
 
-print np.sum(wr>ci_rf)*1./len(wr)
+	print np.sum(wr>ci_rf)*1./len(wr)
+
+def statystyka2_h0():
+	pass
+	

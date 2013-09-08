@@ -9,8 +9,8 @@ from ssvepfun import *
 import os
 
 #### wlasciwosci
-NAZWA_PLIKU='h5_s05_ml'
-FOLDER='data'
+NAZWA_PLIKU='h6030_s01_mn'
+FOLDER='data63'
 ELEKTRODA='o1' # <- nazwa elektrody
 ch_o=18# 18 - O1, 19 - O2, 15 - Pz  <---nr elektrody z pliku XML
 SKALA=6e6
@@ -44,8 +44,11 @@ elek=przygotuj_sygnal(dane,ch_o)
 przerwy=idxBreak(diod)
 stym=idxStym(diod)
 
+#elek_bez=tnij(elek,przerwy,5*fs)
+#elek_sty=tnij(elek,stym,5*fs)
+
 elek_bez=tnij(elek,przerwy+0.15*fs,29.85*fs)
-elek_sty=tnij(elek,stym,60.15*fs)
+elek_sty=tnij(elek,stym,60.15*fs) 
 
 def zapisz():
 	np.save(FOLDER+'/'+NAZWA_PLIKU+'_'+ELEKTRODA+'_bez',elek_bez)
@@ -55,16 +58,15 @@ def zapisz():
 if SAVE==True: zapisz()
 
 
-def zobacz_pojedynczy_trial( PZ=201 ):
+def zobacz_pojedynczy_trial( PZ=0 ):
 	'PZ - numer realizacji, okno prostokatne'
 
-	win=np.hamming(elek_bez[PZ].size)
+	win=np.ones(elek_bez[PZ].size)
 	wins=np.ones(elek_sty[PZ].size)
 	(P,fv)=periodogram(elek_bez[PZ],win,fs)
 	(Ps,fvs)=periodogram(elek_sty[PZ],wins,fs)
-
+	print np.max(Ps)
 	ryspary_brzeg(fv,P,fvs,Ps)
-	py.plot(fv[8090],1e3,'o')
 	py.show()
 
 zobacz_pojedynczy_trial()

@@ -96,10 +96,11 @@ def ind_cz(fq,P=None, step=15, rfval=None):
 		return indlis
 	else:
 		if rfval==None:
-			czp,czk=step-0.1,step+0.1
+			czp,czk=step-0.2,step+0.2
 			ind_czp, ind_czk = np.where(fq>=czp)[0][0],np.where(fq>=czk)[0][0]
-			ind_of_sty=np.argmax(P[ind_czp,ind_czk])
-			return ind_of_sty
+			ind_of_sty=np.argmax(P[ind_czp:ind_czk])
+			#print fq[ind_czp+ind_of_sty],
+			return ind_czp+ind_of_sty
 		else:
 			idx=np.where(fq>=rfval)[0][0]
 			return idx
@@ -125,8 +126,9 @@ def lista_mocy_stym(arr,fs=512,czest=15):
 	for e,trial in enumerate(arr):
 		(P,fv)=periodogram(trial,win,fs)
 		idx=ind_cz(fv,P,step=czest)
-		ind_of_mx[e]=fv[ind]
-		wek[e]=P[ind]
+		ind_of_mx[e]=fv[idx]
+		#print fv[idx],
+		wek[e]=P[idx]
 	return wek, ind_of_mx
 
 def lista_mocy_ref(arr,ind_mx,fs=512,czest=15):
@@ -135,7 +137,7 @@ def lista_mocy_ref(arr,ind_mx,fs=512,czest=15):
 	for e,trial in enumerate(arr):
 		(P,fv)=periodogram(trial,win,fs)
 		idx=ind_cz(fv,P,step=czest,rfval=ind_mx[e])
-		wek[e]=P[ind]
+		wek[e]=P[idx]
 	return wek
 
 def rob_liste_fazy(arr,fs=512):
@@ -156,16 +158,18 @@ def rob_liste_fazy(arr,fs=512):
 def oblicz_roznice_mocy(arr_bez,arr_sty,wiecej=0):
 	'''po zadaniu arr_bez - wektora z trialami bez stymulacji i
 	arr_sty wektora z symulacja wyrzuca wartosci roznicy dla czestosci
-	ustawionej w funkcji rob_liste_mocy
+	ustawionej w funkcji rob_liste_mocy 
+	!!!!!
+	lub jesli uzyto lista_mocy_... to 
 	dla wiecej=True podaje tez wektory z wartoscia mocy stym i ref'''
 	rpc=np.zeros(len(arr_bez))
-	wek_r,wek_s=rob_liste_mocy(arr_bez),rob_liste_mocy(arr_sty)
+	wek_s, ind_mx = lista_mocy_stym(arr_sty)
+	wek_r = lista_mocy_ref(arr_bez,ind_mx)
 	if np.any(wek_r>2e7):
 		wek_r[np.where(wek_r>2e7)[0]]=0
 		wek_s[np.where(wek_r>2e7)[0]]=0
 	
 	rpc=wek_s-wek_r
-
 
 	if wiecej==0: return rpc
 	else: return rpc,wek_s, wek_r

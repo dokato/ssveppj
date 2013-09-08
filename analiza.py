@@ -14,7 +14,7 @@ FOLDER='data63/'
 try:
 	NAZWA= FOLDER+sys.argv[1]
 except Exception:
-	NAZWA=FOLDER+'h6030_s01_mn_o1'
+	NAZWA=FOLDER+'h6030_s06_mg_o1'
 
 o1_bez=np.load(NAZWA+'_bez.npy')
 o1_sty=np.load(NAZWA+'_stym.npy')
@@ -66,8 +66,6 @@ def wspkor(ar1,ar2):
 	return np.corrcoef(ar1,ar2,ddof=1)[0][1]
 
 rm,ws,wr=oblicz_roznice_mocy(o1_bez, o1_sty,wiecej=8)
-print 'mac stym\n',ws
-print 'moc ref\n',wr
 
 py.plot(np.arange(len(rm)),rm,'go')
 py.xlabel('nr trialu')
@@ -75,8 +73,8 @@ py.ylabel('roznica mocy')
 py.savefig(os.getcwd()+'/result/'+NAZWA[-15:]+'moctrial.png')
 #py.show()
 
-uw_ref,fv1=usrednione_widmo(o1_bez)
-uw_sty,fv2=usrednione_widmo(o1_sty)
+#uw_ref,fv1=usrednione_widmo(o1_bez)
+#uw_sty,fv2=usrednione_widmo(o1_sty)
 
 #ryspary(fv1,uw_ref,fv2,uw_sty,lim_y=np.max(uw_sty)+1e4)
 
